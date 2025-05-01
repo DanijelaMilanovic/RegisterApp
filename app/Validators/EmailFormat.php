@@ -7,6 +7,7 @@ namespace App\Validators;
 class EmailFormat implements Rule
 {
     public function __construct(private string $field = 'email') {}
+
     public function validate(mixed $data): string
     {
         return isset($data[$this->field]) &&

@@ -15,11 +15,14 @@ class ValidatorCollection
     public function validate(array $data): array
     {
         $errors = [];
+
         foreach ($this->rules as $rule) {
+
             if ($msg = $rule->validate($data)) {
                 $errors[] = $msg;
             }
         }
+
         return $errors;
     }
 }

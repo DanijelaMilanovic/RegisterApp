@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Validators;
 
-class PasswordMissmatch implements Rule
+class FieldsMissmatch implements Rule
 {
     public function __construct(private string $field, private string $field2) {}
 

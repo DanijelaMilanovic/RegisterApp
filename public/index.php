@@ -1,49 +1,23 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$email = 'john1.doe@example.com';
-$password = 'password';
-$password2 = 'password';
+use App\RequestValidators\RegisterUserRequestValidator;
 
-if (empty($email)) {
-    echo json_encode([
-    'success' => false,
-    'error' => 'email'
-]);
+$email = $_REQUEST['email'];
+$password = $_REQUEST['password'];
+$password2 = $_REQUEST['password2'];
 
-exit;
-}
+$data = [
+   'email'     => $email,
+   'password'  => $password,
+   'password2' => $password2,
+];
 
-if (!preg_match('/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/', $email)) {
-    echo json_encode([
-    'success' => false,
-    'error' => 'email_format'
-    ]);
-    exit;
-}
+$validator = new RegisterUserRequestValidator();
+$validator->validate($data);
 
-if (empty($password) || mb_strlen($password) < 8) {
-    echo json_encode([
-    'success' => false,
-    'error' => 'password'
-    ]);
-    exit;
- }
- 
- if (empty($password2) || mb_strlen($password) < 8) {
-    echo json_encode([
-    'success' => false,
-    'error' => 'password2'
-    ]);
-    exit;
- }
 
- if ($password != $password2) {
-    echo json_encode([
-    'success' => false,
-    'error' => 'password_mismatch'
-    ]);
-    exit;
- }
+/*
 
  $link = mysqli_connect("register-db", "root", "root", "my_db");
     if (!$link) {
@@ -73,4 +47,5 @@ if (empty($password) || mb_strlen($password) < 8) {
     echo json_encode([
     'success' => true,
     'userId' => $userId
-    ]);
+    ]); */
+

@@ -25,9 +25,11 @@ class DatabaseUserRepository implements UserRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['email' => $user->getEmail(), 'password' => password_hash($user->getPassword(), PASSWORD_BCRYPT)]);
         
-        $user->setId((int)$this->pdo->lastInsertId());
-
-        return $user;
+        return new User(
+            (int)$this->pdo->lastInsertId(),
+            $user->getEmail(),
+            $user->getPassword()
+        );
     }
 
     public function findByEmail(string $email): ?User
@@ -49,7 +51,7 @@ class DatabaseUserRepository implements UserRepository
         );
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id): ?User
     {
         $sql = 'SELECT * FROM users WHERE id = :id LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
@@ -57,10 +59,14 @@ class DatabaseUserRepository implements UserRepository
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $row !== false ? $row : null;
+        return new User(
+            (int)$this->pdo->lastInsertId(),
+            $row->getEmail(),
+            $row->getPassword()
+        );
     }
 
-    public function update(int $id, array $data): bool
+    public function update(int $id, User $user): bool
     {
         throw new LogicException('UserRepository::update() is not implemented.');
     }

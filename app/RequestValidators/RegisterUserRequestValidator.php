@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\RequestValidators;
 
 use App\Contracts\RequestValidatorInterface;
+use App\Exceptions\ValidationException;
 use App\Validators\ValidatorBuilder;
 
 class RegisterUserRequestValidator implements RequestValidatorInterface
@@ -14,7 +15,6 @@ class RegisterUserRequestValidator implements RequestValidatorInterface
         $validator = ValidatorBuilder::create()
             ->required('email')
             ->emailFormat('email')
-            //->fieldExists('email', table: 'user')
             ->required('password')
             ->minLength('password', 8)
             ->required('password2')
@@ -25,7 +25,7 @@ class RegisterUserRequestValidator implements RequestValidatorInterface
         $errors = $validator->validate($data);
         
         if (!empty($errors)) {
-            throw new \Exception(json_encode(value: $errors));
+            throw new ValidationException( $errors);
         }
     }
 }

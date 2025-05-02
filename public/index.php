@@ -2,6 +2,9 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Core\JsonResponse;
+use App\Exceptions\ValidationException;
+use App\Infrastructure\MaxMindFraudChecker;
 use App\RequestValidators\RegisterUserRequestValidator;
 use App\Core\DatabaseConfiguration;
 use App\Core\PDOConnection;
@@ -20,7 +23,18 @@ $data = [
 ];
 
 $validator = new RegisterUserRequestValidator();
-$validator->validate($data);
+try {
+   $validator->validate($data);
+} catch (ValidationException $e) {
+   return JsonResponse::validationError($e->getErrors());
+}
+
+$checker = new MaxMindFraudChecker();
+$fraudCheck = $checker->checkFraud($data['email'], $_SERVER['REMOTE_ADDR']);
+
+if($fraudCheck) {
+   return JsonResponse::forbidden('Request denied!');
+}
 
 $config = new DatabaseConfiguration($_ENV);
 $pdo = new PDOConnection($config->db);
@@ -28,7 +42,7 @@ $pdo = new PDOConnection($config->db);
 $userRepository = new DatabaseUserRepository($pdo);
 
 if($userRepository -> findByEmail($data['email']) !== null) {
-   throw new Exception('Email already exists!');
+   return JsonResponse::badRequest('Email already exists!');
 }
 
 $user = new User(
@@ -38,11 +52,8 @@ $user = new User(
 );
 
 $newUser = $userRepository ->create($user);
-/*
 
- mail($email, 'Dobro došli', 'Dobro dosli na nas sajt. Potrebno je samo da potvrdite
- email adresu ...', 'adm@kupujemprodajem.com');
-*/
+mail($user->getEmail(), 'Dobro došli', 'Dobro dosli na nas sajt. Potrebno je samo da potvrdite email adresu ...', 'adm@kupujemprodajem.com');
 
 $userLogRepository = new DatabaseUserLogRepository($pdo);
 $userLog = new UserLog(
@@ -56,7 +67,4 @@ $newUserLog = $userLogRepository->create($userLog);
 
 $_SESSION['userId'] = $user->getId();
 
-echo json_encode([
-'success' => true,
-'userId' => $user->getId(),
-]);
+return JsonResponse::ok(['userId' => $newUser->getId()]);

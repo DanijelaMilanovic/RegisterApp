@@ -5,10 +5,19 @@ RUN apt-get update && apt-get install -y \
     curl \
     zip \
     vim \
-    unzip
+    unzip \
+    msmtp \
+    msmtp-mta \ 
+    ca-certificates 
+
+RUN printf 'sendmail_path = "/usr/bin/msmtp -t"\n' \
+> /usr/local/etc/php/conf.d/sendmail.ini
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN docker-php-ext-install pdo_mysql 
 
 WORKDIR /var/www
+
+COPY ./mail/msmtprc /etc/msmtprc
+RUN chown root:www-data /etc/msmtprc && chmod 640 /etc/msmtprc

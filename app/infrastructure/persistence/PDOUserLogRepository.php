@@ -15,7 +15,7 @@ use App\Infrastructure\Persistence\Query\InsertBuilder;
 use App\Infrastructure\Persistence\Query\SelectBuilder;
 use App\Infrastructure\Persistence\Query\WhereBuilder;
 
-class DatabaseUserLogRepository implements UserLogRepository
+class PDOUserLogRepository implements UserLogRepository
 {
     private PDOConnection $pdo;
 
@@ -48,8 +48,9 @@ class DatabaseUserLogRepository implements UserLogRepository
     public function findById(int $id): ?UserLog
     {
         $selectQueryBuilder = new QueryDirector([
-                        new SelectBuilder('user_log', ['*']),
-                        new WhereBuilder([['id' => $id]])]);
+                                    new SelectBuilder('user_log', ['*']),
+                                    new WhereBuilder([['id' => $id]])
+                                ]);
 
         $selectQuery = $selectQueryBuilder->build();
 

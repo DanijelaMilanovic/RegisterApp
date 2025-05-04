@@ -15,11 +15,19 @@ class JsonResponse
     {
         self::send(400, ['success' => false, 'error' => $message]);
     }
+    
+    public static function conflict(string $message = 'Conflict'): void
+    {
+        self::send(409, ['success' => false, 'error' => $message]);
+    }
     public static function forbidden(string $message = 'Forbidden'): void
     {
         self::send(403, ['success' => false, 'error' => $message]);
     }
-
+    public static function internalServerError(string $message = 'Internal server error'): void
+    {
+        self::send(500, ['success' => false, 'error' => $message]);
+    }
 
     public static function validationError(array $errors): void
     {

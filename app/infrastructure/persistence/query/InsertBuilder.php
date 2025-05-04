@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Query;
 
-class InsertBuilder implements QueryBuilderInterface
+class InsertBuilder implements QueryBuilder
 {
     private string $table;
-    private array  $data;
+    private array $data;
 
     public function __construct(string $table, array  $data)
     {
@@ -23,7 +23,7 @@ class InsertBuilder implements QueryBuilderInterface
 
         $cols = [];
         $vals = [];
-        $i    = 0;
+        $i = 0;
 
         foreach ($this->data as $col => $val) {
             $cols[] = $col;
@@ -31,8 +31,8 @@ class InsertBuilder implements QueryBuilderInterface
             if ($val instanceof Expression) {
                 $vals[] = (string)$val;
             } else {
-                $param        = ':p' . $i++;
-                $vals[]       = $param;
+                $param = ':p' . $i++;
+                $vals[] = $param;
                 $params[$param] = $val;
             }
         }

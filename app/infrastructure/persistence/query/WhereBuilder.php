@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Query;
 
-class WhereBuilder implements QueryBuilderInterface
+class WhereBuilder implements QueryBuilder
 {
     private array $conditions = [];
 
@@ -25,8 +25,8 @@ class WhereBuilder implements QueryBuilderInterface
                 $clauses[] = (string)$cond;
             } elseif (is_array($cond)) {
                 foreach ($cond as $col => $val) {
-                    $param          = ":w{$i}_{$col}";
-                    $clauses[]      = "$col = $param";
+                    $param = ":w{$i}_{$col}";
+                    $clauses[] = "$col = $param";
                     $params[$param] = $val;
                 }
             }

@@ -8,7 +8,11 @@ use App\Presentation\Validation\Rule;
 
 class Required implements Rule
 {
-    public function __construct(private string $field) {}
+    private string $field;
+    public function __construct(string $field)
+    {
+        $this->field = $field;
+    }
 
     public function validate(mixed $data): string
     {

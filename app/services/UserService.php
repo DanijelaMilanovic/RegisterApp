@@ -8,33 +8,35 @@ use App\Domain\User;
 use App\Domain\UserLog;
 use App\Domain\Repository\UserRepository;
 use App\Domain\Repository\UserLogRepository;
-
 use App\Services\Dtos\UserRegisterDto;
-use App\Presentation\Http\JsonResponse; //TODO: refactor this 
+use App\Shared\Exceptions\DuplicateException;
+use App\Shared\Exceptions\FraudException;
 
 class UserService
 {
     private UserRepository $userRepository;
     private UserLogRepository $userLogRepository;
-    private FraudCheckerStrategy $fraudCheckerStrategy;
+    private FraudChecker $fraudChecker;
+    private Mailer $mailer;
 
-    public function __construct(UserRepository $userRepository, UserLogRepository $userLogRepository, FraudCheckerStrategy $fraudCheckerStrategy)
+    public function __construct(UserRepository $userRepository, UserLogRepository $userLogRepository, FraudChecker $fraudChecker, Mailer $mailer)
     {
         $this->userRepository = $userRepository;
         $this->userLogRepository = $userLogRepository;
-        $this->fraudCheckerStrategy = $fraudCheckerStrategy;
+        $this->fraudChecker = $fraudChecker;
+        $this->mailer = $mailer;
     }
 
-    public function registerUser(UserRegisterDto $data): void
+    public function registerUser(UserRegisterDto $data): array
     {
-        $fraudCheck = $this -> fraudCheckerStrategy->checkFraud($data->email, $data->ip);
+        $fraudCheck = $this -> fraudChecker->checkFraud($data->email, $data->ip);
         
         if($fraudCheck) {
-           JsonResponse::forbidden('Request denied!');
+           throw new FraudException('Fraud detected!');
         }
                 
         if($this->userRepository -> findByEmail($data->email)) {
-           JsonResponse::badRequest('Email already exists!');
+           throw new DuplicateException('Email already exists!');
         }
         
         $user = new User(
@@ -45,7 +47,7 @@ class UserService
         
         $newUser = $this->userRepository ->create($user);
         
-        mail($user->getEmail(), 'Dobro došli', 'Dobro dosli na nas sajt. Potrebno je samo da potvrdite email adresu ...', 'adm@kupujemprodajem.com');
+        $this->mailer->send($user->getEmail(), 'Dobro došli', 'Dobro došli na nas sajt. Potrebno je samo da potvrdite email adresu ...');
         
         $userLog = new UserLog(
            null,
@@ -56,8 +58,10 @@ class UserService
         
         $this -> userLogRepository->create($userLog);
         
+        session_start();
         $_SESSION['userId'] = $user->getId();
         
-        JsonResponse::ok(['userId' => $newUser->getId()]);
+        return ['userId' => $newUser->getId()];
     }
+
 }

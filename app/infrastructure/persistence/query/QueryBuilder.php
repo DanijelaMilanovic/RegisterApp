@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Query;
 
-interface QueryBuilderInterface
+interface QueryBuilder
 {
     public function build(array &$params): string;
 }

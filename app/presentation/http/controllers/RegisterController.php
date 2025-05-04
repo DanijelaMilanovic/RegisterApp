@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Presentation\Http\Controllers;
 
-use App\Shared\Exceptions\ValidationException;
 use App\Presentation\Validation\RegisterUserRequestValidator;
 use App\Presentation\Http\JsonResponse;
 use App\Services\UserService;
@@ -21,20 +20,17 @@ class RegisterController
     public function register(array $request): void
     {
         $requestValidator = new RegisterUserRequestValidator();
-        try {
-            $requestValidator->validate($request);
-        } catch (ValidationException $e) {
-        JsonResponse::validationError($e->getErrors());
-}
+        $requestValidator->validate($request);
+
         $userRegisterDto = new UserRegisterDto(
             $request['email'],
             $request['password'],
             $request['password2'],
             $_SERVER['REMOTE_ADDR']
         );
+            
+        $result = $this -> userService -> registerUser($userRegisterDto);
 
-        $this -> userService -> registerUser($userRegisterDto);
-
-        
+        JsonResponse::ok($result);
     }
 }

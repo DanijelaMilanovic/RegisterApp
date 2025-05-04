@@ -6,10 +6,13 @@ namespace App\Infrastructure\Persistence\Query;
 
 class Expression
 {
-   private function __construct(private string $sql)
-   {
+    private string $sql;
 
-   }
+    private function __construct(string $sql)
+    {
+        $this->sql = $sql;
+    }
+    
     public static function raw(string $sql): self
     {
         return new self($sql);
@@ -18,5 +21,4 @@ class Expression
     {
         return $this->sql;
     }
-
 }

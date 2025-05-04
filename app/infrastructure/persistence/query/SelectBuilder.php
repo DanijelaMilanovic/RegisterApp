@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Persistence\Query;
 
-class SelectBuilder implements QueryBuilderInterface
+class SelectBuilder implements QueryBuilder
 {
     private string $table;
     private array $columns = ['*'];

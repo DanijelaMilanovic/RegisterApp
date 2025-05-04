@@ -8,7 +8,12 @@ use App\Presentation\Validation\Rule;
 
 class EmailFormat implements Rule
 {
-    public function __construct(private string $field = 'email') {}
+    private string $field;
+    
+    public function __construct(string $field = 'email')
+    {
+        $this->field = $field;
+    }
 
     public function validate(mixed $data): string
     {

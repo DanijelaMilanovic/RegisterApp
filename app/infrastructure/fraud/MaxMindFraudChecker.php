@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Fraud;
 
-use App\Services\FraudCheckerStrategy;
+use App\Services\FraudChecker;
 
-class MaxMindFraudChecker implements FraudCheckerStrategy
+class MaxMindFraudChecker implements FraudChecker
 {
-
     public function checkFraud(string $email, string $ip): bool
     {
         $badEmails = ['fraud.com', 'bad.mail'];

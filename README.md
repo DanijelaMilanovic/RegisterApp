@@ -9,5 +9,4 @@ Concepts and techniques used:
 * PSR-4 autoloading (Composer)  
 * A minimal **QueryBuilder** with support for “RAW” SQL expressions (`NOW()`, `INTERVAL …`)
 
-
 ![alt text](image.png)

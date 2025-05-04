@@ -8,7 +8,14 @@ use App\Presentation\Validation\Rule;
 
 class MinLength implements Rule
 {
-    public function __construct(private string $field, private int $len) {}
+    private string $field;
+    private int $len;
+    
+    public function __construct(string $field, int $len)
+    {
+        $this->field = $field;
+        $this->len = $len;
+    }
 
     public function validate(mixed $data): string
     {

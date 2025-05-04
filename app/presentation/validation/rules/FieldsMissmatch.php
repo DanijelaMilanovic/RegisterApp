@@ -8,7 +8,13 @@ use App\Presentation\Validation\Rule;
 
 class FieldsMissmatch implements Rule
 {
-    public function __construct(private string $field, private string $field2) {}
+    private string $field;
+    private string $field2;
+    public function __construct(string $field, string $field2)
+    {
+        $this->field = $field;
+        $this->field2 = $field2;
+    }
 
     public function validate(mixed $data): string
     {

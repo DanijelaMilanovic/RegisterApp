@@ -10,12 +10,11 @@ use App\Domain\User;
 use App\Domain\Repository\UserRepository;
 use App\Infrastructure\Persistence\PDOConnection;
 use App\Infrastructure\Persistence\Query\QueryDirector;
-use App\Infrastructure\Persistence\Query\Expression;
 use App\Infrastructure\Persistence\Query\InsertBuilder;
 use App\Infrastructure\Persistence\Query\SelectBuilder;
 use App\Infrastructure\Persistence\Query\WhereBuilder;
 
-class DatabaseUserRepository implements UserRepository
+class PDOUserRepository implements UserRepository
 {
     private PDOConnection $pdo;
 
@@ -26,9 +25,17 @@ class DatabaseUserRepository implements UserRepository
 
     public function create(User $user): User
     {
-        $sql = 'INSERT INTO user (email, password) VALUES (:email, :password)';
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['email' => $user->getEmail(), 'password' => $user->getPassword()]);
+        $data = [
+            'email' => $user->getEmail(),
+            'password' => $user->getPassword(),
+        ];
+
+        $insertQueryBuilder = new QueryDirector([
+            new InsertBuilder('user',$data)]);
+
+        $insertQuery = $insertQueryBuilder->build();
+        $stmt = $this->pdo->prepare($insertQuery->getSql());
+        $stmt->execute($insertQuery->getParams());
         
         return new User(
             (int)$this->pdo->lastInsertId(),
@@ -38,10 +45,15 @@ class DatabaseUserRepository implements UserRepository
     }
 
     public function findByEmail(string $email): ?User
-    {
-        $sql = 'SELECT * FROM user WHERE email = :email LIMIT 1';
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':email' => $email]);
+    {   $selectQueryBuilder = new QueryDirector([
+            new SelectBuilder('user', ['*']),
+            new WhereBuilder([['email' => $email]])
+        ]);
+
+        $selectQuery = $selectQueryBuilder->build();
+
+        $stmt = $this->pdo->prepare($selectQuery->getSql());
+        $stmt->execute($selectQuery->getParams());
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -58,9 +70,15 @@ class DatabaseUserRepository implements UserRepository
 
     public function findById(int $id): ?User
     {
-        $sql = 'SELECT * FROM users WHERE id = :id LIMIT 1';
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':id' => $id]);
+        $selectQueryBuilder = new QueryDirector([
+            new SelectBuilder('user', ['*']),
+            new WhereBuilder([['id' => $id]])
+        ]);
+
+        $selectQuery = $selectQueryBuilder->build();
+
+        $stmt = $this->pdo->prepare($selectQuery->getSql());
+        $stmt->execute($selectQuery->getParams());
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 

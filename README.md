@@ -22,16 +22,22 @@ To set up and run the Register App, follow these steps:
     git clone https://github.com/DanijelaMilanovic/RegisterApp.git
     ```
 
-2. **Start Docker Containers**  
+2. **Set environment variables**  
+    Create .env file as shown in .env.example.
+    For test purposes use MAIL_FROM=markomarkovictest3@gmail.com
+
+
+3. **Start Docker Containers**  
     Navigate to the `docker` directory and start the Docker containers using `docker-compose`:  
     ```bash
     cd docker
     docker-compose up
     ```
 
-3. **Set Up the Database**  
+4. **Set Up the Database**  
     - Open the file `documents/database-script.sql`.  
     - Copy the contents of the file and execute them on your database.
 
-4. **Access the Application**  
+5. **Access the Application**  
     Send a POST request to `http://localhost:8000` to perform the registration.
+
